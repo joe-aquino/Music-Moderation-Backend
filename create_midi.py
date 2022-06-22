@@ -87,11 +87,20 @@ def transcribe_from_string(audio_string):
     
     return midi_file_name
 
+# this function takes care of alignment tool management (because it's so fucked)
+def align(user_midi_file_name, reference_midi_file_name):
+    # move user midi to alignment folder
+    subp.check_call('mv ' + user_midi_file_name + ' AlignmentTool/' + user_midi_file_name, shell=True)
+    # move reference midi to alignment folder
+    subp.check_call('mv ' + reference_midi_file_name + ' AlignmentTool/' + reference_midi_file_name, shell=True)
+    # change directory to alignment folder and run alignment on user and reference midi
+    subp.check_call('cd AlignmentTool/ && ./MIDIToMIDIAlign.sh ' + user_midi_file_name[:-4] + ' ' + reference_midi_file_name[:-4], shell=True)
+
 # right now reference midi file name = None and it WILL crash when executed
 def extract_errors(user_midi_file_name, reference_midi_file_name):
     # run alignment tool
-    # subp.check_call('mv ' + user_midi_file_name + ' AlignmentTool/' + user_midi_file_name + ' && mv ' + reference_midi_file_name + ' AlignmentTool/' + reference_midi_file_name + ' && cd AlignmentTool/ && ./MIDIToMIDIAlign.sh ' + user_midi_file_name[:-4] + ' ' + reference_midi_file_name[:-4] + ' && cd ..', shell=True)
-    # load tables into panda
+    align(user_midi_file_name, reference_midi_file_name)
+    # load tables into pandas
     corresp_file_name = 'AlignmentTool/' + reference_midi_file_name[:-4] + "_corresp.txt"
     corresp_header = ["id", "onset_time", "spelled_pitch", "integer_pitch", "onset_velocity", "reference_id",
                 "reference_onset_time", "reference_spelled_pitch", "reference_integer_pitch", "reference_onset_velocity", "blank"]
@@ -174,4 +183,4 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
 
     return performance_data
 
-print(extract_errors("test_user.mid", "test_ref.mid"))
+print(extract_errors("reference_1octave_up.mid", "reference_1octave_up_copy.mid"))
