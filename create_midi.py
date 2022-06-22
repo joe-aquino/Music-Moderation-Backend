@@ -116,13 +116,15 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
     #     note_type -> "extra, missing, incorrect, reference"
     # ]
 
+    # consider creating rests as well
+
     # code below is untested, need audio from Mohamed and reference midi
 
     reference_bpm = 60 # should come from midi
     reference_timesig_numerator = 4 # should come from midi
     reference_timesig_denominator = 4 # should come from midi
-    # measure is time / beats per second * 4 (give 4/4 time signature)
-    measure_func = lambda time : time // (reference_bpm/60*4)
+    # measure is time / beats per second * reference_timesig_numerator
+    measure_func = lambda time : time // (reference_bpm / 60 * reference_timesig_numerator)
 
     performance_data = {
         'bpm': reference_bpm,
@@ -166,6 +168,9 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
         performance_data['notes'].append(note)
 
     # it would be good to remove generated txt files and the midi files here
+
+    # sort notes of dictionary by onset time
+    performance_data['notes'].sort(key=lambda x: x['onset_time'])
 
     return performance_data
 
