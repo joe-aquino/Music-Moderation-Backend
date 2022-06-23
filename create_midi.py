@@ -7,6 +7,8 @@ import pandas as pd
 import wave
 import pyaudio
 import subprocess as subp
+from io import BytesIO
+import json
 
 # BPM that should be set by the song user is playing
 # upd 6/9/22 - this doesn't really matter because we are using seconds
@@ -39,10 +41,11 @@ def transcribe_from_string(audio_string):
     # write wav file
     audio_file_name = str(ts) + ".wav"
     # print(audio_bytes)
-    with open(audio_file_name, "w+b") as file:
-       file.write(audio_bytes)
-    # wtf
-    # subp.check_call("ffmpeg -i " + audio_file_name + " -acodec pcm_s16le -ac 1 -ar 16000 " + audio_file_name, shell=True)
+    with open(audio_file_name, "wb") as file:
+        filebytes = BytesIO()
+        filebytes.write(audio_bytes)
+        # Copy the BytesIO stream to the output file
+        file.write(audio_bytes.getbuffer())
     # read wav file
     f = wave.open(audio_file_name, "rb")
     # create audio bytestream
@@ -91,8 +94,8 @@ def transcribe_from_string(audio_string):
 def align(user_midi_file_name, reference_midi_file_name):
     # move user midi to alignment folder
     subp.check_call('mv ' + user_midi_file_name + ' AlignmentTool/' + user_midi_file_name, shell=True)
-    # move reference midi to alignment folder
-    subp.check_call('mv ' + reference_midi_file_name + ' AlignmentTool/' + reference_midi_file_name, shell=True)
+    # copy reference midi to alignment folder
+    subp.check_call('cp ' + 'reference_midi/' + reference_midi_file_name + ' AlignmentTool/' + reference_midi_file_name, shell=True)
     # change directory to alignment folder and run alignment on user and reference midi
     subp.check_call('cd AlignmentTool/ && ./MIDIToMIDIAlign.sh ' + user_midi_file_name[:-4] + ' ' + reference_midi_file_name[:-4], shell=True)
 
@@ -183,4 +186,4 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
 
     return performance_data
 
-print(extract_errors("reference_1octave_up.mid", "reference_1octave_up_copy.mid"))
+#print(json.dumps(extract_errors("reference_1octave_up.mid", "reference_1octave_up_copy.mid")))
