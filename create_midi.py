@@ -181,8 +181,8 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
 
     # it would be good to remove generated txt files and the midi files here
 
-    # sort notes of dictionary by onset time
-    performance_data['notes'].sort(key=lambda x: x['onset_time'])
+    # sort notes of dictionary by onset time and pitch
+    performance_data['notes'].sort(key=lambda x: (x['onset_time'], x['pitch_integer']))
 
     return performance_data
 
