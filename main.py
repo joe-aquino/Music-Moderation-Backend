@@ -28,6 +28,17 @@ def ReturnJSON():
 
         return jsonify(data)
 
+@app.route('/api/references', methods=['GET'])
+def get_reference_list():
+    ref_path = './reference_midi'
+    ref_list = [file_name[:-5] for file_name in os.listdir(ref_path)]
+
+    data = {
+        'reference_files': ref_list
+    }
+
+    return jsonify(data)
+
 # api endpoint for mobile app to send audio bytes to
 # accepts POST requests with JSON data
 # if audio is missing, returns "fuck off"

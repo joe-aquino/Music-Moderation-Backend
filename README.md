@@ -19,11 +19,25 @@
 
 |verb|endpoint|request|response|notes|
 --- | --- | ---|---|---|
-|POST|/api/transcribe|{ "audio": BASE64 AUDIO FILE }|{ see below }|request must me in json, audio should be sent in PCM 16-bit format at 16kHz sampling rate|
+|POST|/api/transcribe|{ "audio": BASE64 AUDIO FILE }| list of notes for vexflow |request must me in json, audio should be sent in PCM 16-bit format at 16kHz sampling rate|
+|GET|/api/references| { any }| list of reference files | none |
 |GET|/api/transcribe| { any }|{ "Kidnap": "Influencer", "Subject": "Post Toilet Bowl for me" }|do we even need this?
 
 ## Example output
 
+### References
+```
+{
+    "reference_files": [
+        "reference_1octave_up",
+        "twinkle",
+        "fly_me_to_the_moon",
+        "Werewolves_Of_London"
+    ]
+}
+```
+
+### Transcribe
 ```
 {
   "bpm": 60,
