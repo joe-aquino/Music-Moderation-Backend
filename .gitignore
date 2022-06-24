@@ -1,5 +1,5 @@
 # ignore midi and text files
-*.mid
+/AlignmentTool/*.mid
 *.txt
 *.pdf
 # also ignore wav files
