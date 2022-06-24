@@ -45,7 +45,7 @@ def transcribe_from_string(audio_string):
         filebytes = BytesIO()
         filebytes.write(audio_bytes)
         # Copy the BytesIO stream to the output file
-        file.write(audio_bytes.getbuffer())
+        file.write(filebytes.getbuffer())
     # read wav file
     f = wave.open(audio_file_name, "rb")
     # create audio bytestream
