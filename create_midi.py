@@ -9,6 +9,8 @@ import pyaudio
 import subprocess as subp
 from io import BytesIO
 import json
+import binascii
+import soundfile
 
 # BPM that should be set by the song user is playing
 # upd 6/9/22 - this doesn't really matter because we are using seconds
@@ -41,11 +43,15 @@ def transcribe_from_string(audio_string):
     # write wav file
     audio_file_name = str(ts) + ".wav"
     # print(audio_bytes)
-    with open(audio_file_name, "wb") as file:
+    with open(audio_file_name, "wb") as audio_file:
+        bin_audio = binascii.a2b_base64(audio_bytes[27:])
         filebytes = BytesIO()
-        filebytes.write(audio_bytes)
+        filebytes.write(bin_audio)
         # Copy the BytesIO stream to the output file
-        file.write(filebytes.getbuffer())
+        audio_file.write(filebytes.getbuffer())
+    # make sure file is in correct format
+    data, samplerate = soundfile.read(audio_file_name)
+    soundfile.write(audio_file_name, data, 16000, subtype='PCM_16')
     # read wav file
     f = wave.open(audio_file_name, "rb")
     # create audio bytestream
@@ -60,7 +66,7 @@ def transcribe_from_string(audio_string):
     # iterate through the audio by chunk
     while buffer:
         # decode data from buffer
-        decoded = np.frombuffer(buffer, dtype=np.int16)
+        decoded = np.array(np.frombuffer(buffer, dtype=np.int16) / 32768)
         # transcribe the audio to see what what notes came on and off
         frame_output = transcriber.inference(decoded)
         # when model detects onset of a note
@@ -163,7 +169,7 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
         elif idx == '*':
             note_type = "missing"
         # process incorrect pitch
-        elif match_data.loc[idx]["error_index"] == 1:
+        elif match_data.iloc[[idx]]["error_index"].values[0] == 1:
             note_type = "incorrect"
             pitch_played_spelled = match_data.iloc[[idx]]['spelled_pitch']
 
@@ -185,5 +191,3 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
     performance_data['notes'].sort(key=lambda x: (x['onset_time'], x['pitch_integer']))
 
     return performance_data
-
-#print(json.dumps(extract_errors("reference_1octave_up.mid", "reference_1octave_up_copy.mid")))

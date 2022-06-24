@@ -46,12 +46,11 @@ def transcribe_endpoint():
             # transcribe audio (this is a placeholder)
             user_midi_file_name = create_midi.transcribe_from_string(json['audio'])
 
-            # parse resulting midi to get errors and return extra notes (pitch + time)
-            # THIS WILL NOT WORK, NEED REFERENCE FILE
-            # user_mistakes = create_midi.extract_errors(user_midi_file_name, reference_midi_file_name=None)
-
-            # this is a dummy temporary return !!!!!
-            data = { "midi_file":user_midi_file_name }
+            # compare to reference and get error dict
+            # CURRENTLY HAS HARDCODED REFERENCE!!!!
+            data = create_midi.extract_errors(user_midi_file_name, "reference_1octave_up.mid")
+            
+            # convert output dictionary to json and respond to app
             return jsonify(data)
 
     # else (any error) -> return fuck off
