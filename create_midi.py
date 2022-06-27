@@ -56,9 +56,9 @@ def transcribe_from_string(audio_string):
     f = wave.open(audio_file_name, "rb")
     # create audio bytestream
     p = pyaudio.PyAudio()
-    stream = p.open(format = p.get_format_from_width(f.getsampwidth()),  
-                channels = f.getnchannels(),  
-                rate = f.getframerate(),  
+    stream = p.open(format = p.get_format_from_width(f.getsampwidth()),
+                channels = f.getnchannels(),
+                rate = f.getframerate(),
                 output = True)
     # read first chunk of audio
     buffer = f.readframes(CHUNK)
@@ -91,7 +91,7 @@ def transcribe_from_string(audio_string):
     midi_file_name = str(ts) + ".mid"
     with open(midi_file_name, "w+b") as output_file:
         MyMIDI.writeFile(output_file)
-    
+
     return midi_file_name
 
 # this helper method takes care of alignment tool management (because it's so fucked)
@@ -131,6 +131,8 @@ def vexflow_length(beat_length):
     if beat_length >= 0.99:
         vf_length = 'w'
 
+    return vf_length
+
 # this helper method cleans up the directories from generated clutter
 def clean_up(user_midi_file_name, reference_midi_file_name):
     # remove wav
@@ -166,7 +168,7 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
                 "offset_velocity", "channel", "match_status", "score_time", "note_id",
                 "error_index", "skip_index"]
     match_data = pd.read_csv(match_file_name, sep='\t', skiprows=[0,1,2,3], names=match_header, index_col=0)[:-2]
-    
+
     spr_file_name = 'AlignmentTool/' + reference_midi_file_name[:-4] + "_spr.txt"
     spr_header = ["id", "onset_time", "offset_time", "spelled_pitch", "onset_velocity", "other_velocity", "null"]
     spr_data = pd.read_csv(spr_file_name, sep='\t', skiprows=[0], names=spr_header, index_col=0)
