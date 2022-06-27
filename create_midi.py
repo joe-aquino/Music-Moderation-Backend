@@ -108,27 +108,27 @@ def align(user_midi_file_name, reference_midi_file_name):
 # this hmethod converts beat length (0-1) to vexflow friendly units
 def vexflow_length(beat_length):
     vf_length = 'q'
-    if beat_length >= 0.03124:
+    if beat_length <= 0.03126:
         vf_length = '32'
-    if beat_length >= 0.046874:
+    if beat_length <= 0.046876:
         vf_length = '32d'
-    if beat_length >= 0.0624:
+    if beat_length <= 0.0626:
         vf_length = '16'
-    if beat_length >= 0.09375:
+    if beat_length <= 0.09376:
         vf_length = '16d'
-    if beat_length >= 0.124:
+    if beat_length <= 0.126:
         vf_length = '8'
-    if beat_length >= 0.1875:
+    if beat_length <= 0.1876:
         vf_length = '8d'
-    if beat_length >= 0.24:
+    if beat_length <= 0.26:
         vf_length = 'q'
-    if beat_length >= 0.374:
+    if beat_length <= 0.376:
         vf_length = 'qd'
-    if beat_length >= 0.49:
+    if beat_length <= 0.51:
         vf_length = 'h'
-    if beat_length >= 0.74:
+    if beat_length <= 0.76:
         vf_length = 'hd'
-    if beat_length >= 0.99:
+    if beat_length <= 1.0:
         vf_length = 'w'
 
     return vf_length
@@ -214,8 +214,9 @@ def extract_errors(user_midi_file_name, reference_midi_file_name):
         # get note length if reference exists
         if row['reference_id'] != '*':
             time_length = spr_data.iloc[[row['reference_id']]]["time_diff"].values[0]
-            beat_length = (BPM * reference_timesig_numerator) / 60
+            beat_length = (reference_bpm * reference_timesig_numerator) / 60 * (time_length)
             length = vexflow_length(beat_length)
+            print(pitch_spelled, length)
 
         # process extra notes
         if row['reference_id'] == '*':
