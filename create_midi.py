@@ -108,27 +108,27 @@ def align(user_midi_file_name, reference_midi_file_name):
 # this hmethod converts beat length (0-1) to vexflow friendly units
 def vexflow_length(beat_length):
     vf_length = 'q'
-    if beat_length <= 0.03126:
+    if beat_length >= 0.03124:
         vf_length = '32'
-    if beat_length <= 0.046876:
+    if beat_length >= 0.046874:
         vf_length = '32d'
-    if beat_length <= 0.0626:
+    if beat_length >= 0.0624:
         vf_length = '16'
-    if beat_length <= 0.09376:
+    if beat_length >= 0.09374:
         vf_length = '16d'
-    if beat_length <= 0.126:
+    if beat_length >= 0.124:
         vf_length = '8'
-    if beat_length <= 0.1876:
+    if beat_length >= 0.1874:
         vf_length = '8d'
-    if beat_length <= 0.26:
+    if beat_length >= 0.24:
         vf_length = 'q'
-    if beat_length <= 0.376:
+    if beat_length >= 0.374:
         vf_length = 'qd'
-    if beat_length <= 0.51:
+    if beat_length >= 0.49:
         vf_length = 'h'
-    if beat_length <= 0.76:
+    if beat_length >= 0.74:
         vf_length = 'hd'
-    if beat_length <= 1.0:
+    if beat_length >= 0.99:
         vf_length = 'w'
 
     return vf_length
@@ -214,16 +214,28 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
         # get note length if reference exists
         if row['reference_id'] != '*':
             time_length = spr_data.iloc[[row['reference_id']]]["time_diff"].values[0]
-            beat_length = (reference_bpm * reference_timesig_numerator) / 60 * (time_length)
+            # beat_length = time_length / measures per second
+            # measures per minute = bpm / time signature numerator
+            # measure per second = measures per minute / 60 seconds
+            # / 4 is an UGLY HACK
+            beat_length = (time_length / ((reference_bpm / reference_timesig_numerator) / 60)) / 4 / 4
             length = vexflow_length(beat_length)
-            print(pitch_spelled, length)
+            print(pitch_spelled, length, beat_length, time_length)
 
         # process extra notes
         if row['reference_id'] == '*':
             note_type = "extra"
             pitch_integer = row['integer_pitch']
             pitch_spelled = row['spelled_pitch']
-            onset_time = row['onset_time']
+            # TODO: remove this ugly hack
+            # if first note is extra, just assing it default onset time
+            if len(performance_data['notes']) > 0:
+                onset_time = performance_data['notes'][-1]['onset_time'] + 0.01
+            else:
+                onset_time = row['onset_time']
+            # uncomment to see extra notes (my - Peter's - digital piano is trash
+            # and it looks awful in my current setup)
+            # measure = measure_func(onset_time)
             length = 'q'
         # process missing notes
         elif idx == '*':
@@ -232,6 +244,10 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
         elif match_data.iloc[[idx]]["error_index"].values[0] == 1:
             note_type = "incorrect"
             pitch_played_spelled = match_data.iloc[[idx]]['spelled_pitch'].values[0]
+
+        # remove if first notes of the piece break
+        if onset_time == 0.0 and note_type == "missing":
+            note_type = "reference"
 
         note = {
             'measure': measure,

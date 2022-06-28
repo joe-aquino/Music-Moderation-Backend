@@ -12,13 +12,13 @@
 ## Hack
 
 1. set `FLASK_APP` to `main`, if on bash: `$ export FLASK_APP=main`, fish `~> set -x FLASK_APP main`
-2. run `$ flask run --host=0.0.0.0`
+2. run `$ flask run --host=0.0.0.0 --reload` - that `--reload` flag saves hours of time
 3. run the [react app](https://github.com/MedNoun/music-react/)
 
 ## Deploy
 
 1. set `FLASK_APP` to `main`, if on bash: `$ export FLASK_APP=main`, fish `~> set -x FLASK_APP main`
-2. set `FLASK_ENV` to `production` (same way as described above)
+2. set `FLASK_ENV` to `deploy` (same way as described above)
 3. run `$ flask run --host=0.0.0.0`
 
 ## API
