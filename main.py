@@ -31,7 +31,7 @@ def ReturnJSON():
 @app.route('/api/references', methods=['GET'])
 def get_reference_list():
     ref_path = './reference_midi'
-    ref_list = [file_name[:-5] for file_name in os.listdir(ref_path)]
+    ref_list = [file_name[:-4] for file_name in os.listdir(ref_path)]
 
     data = {
         'reference_files': ref_list
@@ -60,7 +60,7 @@ def transcribe_endpoint():
             # compare to reference and get error dict
             # CURRENTLY HAS HARDCODED REFERENCE!!!!
             data = create_midi.extract_errors(user_midi_file_name, "reference_1octave_up.mid")
-            
+
             # convert output dictionary to json and respond to app
             return jsonify(data)
 
@@ -71,7 +71,7 @@ def transcribe_endpoint():
 '''
 async def socket(request):
     ws = web.WebSocketResponse()
-    await ws.prepare(request) 
+    await ws.prepare(request)
 
     deepgram_socket = await process_audio(ws)
 
@@ -83,7 +83,7 @@ async def process_audio(fast_socket: web.WebSocketResponse):
     async def get_transcript(data: Dict) -> None:
         if 'channel' in data:
             transcript = data['channel']['alternatives'][0]['transcript']
-        
+
             if transcript:
                 await fast_socket.send_str(transcript)
     return 0
@@ -93,3 +93,4 @@ if __name__=="__main__":
     loop = asyncio.get_event_loop()
     port = int(os.environ.get('PORT', 5000))
     app.run(host='192.168.1.6')
+

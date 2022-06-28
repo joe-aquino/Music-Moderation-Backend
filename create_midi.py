@@ -154,7 +154,7 @@ def clean_up(user_midi_file_name, reference_midi_file_name):
     subp.run('rm AlignmentTool/' + reference_midi_file_name, shell=True)
 
 # right now reference midi file name = None and it WILL crash when executed
-def extract_errors(user_midi_file_name, reference_midi_file_name):
+def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1octave_up.mid"):
     # run alignment tool
     align(user_midi_file_name, reference_midi_file_name)
     # load tables into pandas
