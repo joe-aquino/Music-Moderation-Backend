@@ -8,7 +8,6 @@ import create_midi
 
 from flask import Flask, jsonify, request, render_template
 
-
 app = Flask(__name__)
 sockets = Sock(app)
 
@@ -58,39 +57,21 @@ def transcribe_endpoint():
             user_midi_file_name = create_midi.transcribe_from_string(json['audio'])
 
             # compare to reference and get error dict
-            # CURRENTLY HAS HARDCODED REFERENCE!!!!
-            data = create_midi.extract_errors(user_midi_file_name, "reference_1octave_up.mid")
-
             # convert output dictionary to json and respond to app
+            if 'reference' in json:
+                data = create_midi.extract_errors(user_midi_file_name, reference_midi_file_name=json['reference'])
+                return jsonify(data)
+            # if no reference is provided, use the test file
+            data = create_midi.extract_errors(user_midi_file_name, reference_midi_file_name="reference_1octave_up.mid")
             return jsonify(data)
+
 
     # else (any error) -> return fuck off
     data = { 'fuck':'off' }
     return jsonify(data)
 
-'''
-async def socket(request):
-    ws = web.WebSocketResponse()
-    await ws.prepare(request)
-
-    deepgram_socket = await process_audio(ws)
-
-    while True:
-        data = await ws.receive_bytes()
-        deepgram_socket.send(data)
-
-async def process_audio(fast_socket: web.WebSocketResponse):
-    async def get_transcript(data: Dict) -> None:
-        if 'channel' in data:
-            transcript = data['channel']['alternatives'][0]['transcript']
-
-            if transcript:
-                await fast_socket.send_str(transcript)
-    return 0
-'''
-
 if __name__=="__main__":
     loop = asyncio.get_event_loop()
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='192.168.1.6')
+    app.run(host='0.0.0.0')
 

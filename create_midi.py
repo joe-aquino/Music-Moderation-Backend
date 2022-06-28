@@ -220,7 +220,6 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
             # / 4 is an UGLY HACK
             beat_length = (time_length / ((reference_bpm / reference_timesig_numerator) / 60)) / 4 / 4
             length = vexflow_length(beat_length)
-            print(pitch_spelled, length, beat_length, time_length)
 
         # process extra notes
         if row['reference_id'] == '*':
