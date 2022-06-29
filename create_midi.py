@@ -8,7 +8,6 @@ import wave
 import pyaudio
 import subprocess as subp
 from io import BytesIO
-import json
 import binascii
 import soundfile
 
@@ -244,20 +243,20 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
                 if time_diff > 0:
                     # calculate pause length
                     pause_beat_length = (time_length / ((reference_bpm / reference_timesig_numerator) / 60)) / 4 / 4
-                    pause_length = vexflow_length(pause_beat_length)
+                    pause_length = vexflow_length(pause_beat_length) + 'r'
                     # generate the pause
                     pause = {
                         'measure': measure,
                         'pitch_integer': 0,
-                        'pitch_spelled': 'pause',
-                        'pitch_played_spelled': 'pause',
-                        'onset_time': last_onset,
+                        'pitch_spelled': 'b4',
+                        'pitch_played_spelled': 'b4',
+                        'onset_time': last_onset+0.01,
                         'length': pause_length,
                         'note_type': 'pause'
                         }
                     # push pause to note array
                     # UNCOMMENT WHEN FRONTEND CAN HANDLE PAUSES
-                    # performance_data['notes'].append(pause)
+                    performance_data['notes'].append(pause)
 
         # get note length if reference exists
         if row['reference_id'] != '*':
