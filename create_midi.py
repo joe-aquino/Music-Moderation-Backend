@@ -211,6 +211,54 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
         note_type = "reference"
         length = None
 
+        # check if a pause exists
+        if idx != '*' and row['reference_id'] != '*':
+            if int(idx) >= 1 and int(row['reference_id']) >= 1:
+                # get data about notes
+                last_onset = None
+                last_offset = None
+                current_onset = None
+
+                # the reason why this code is so complex (and generally
+                # everything that involves spr_data) is because offset
+                # values are stored in there and have to be retrieved
+                # through these ridiculous manipulations
+
+                # if current note is a chord, grab one note from it
+                if type(spr_data.iloc[int([row['reference_id']][0])]["onset_time"]) == 'list':
+                    current_onset = spr_data.iloc[int([row['reference_id']][0])]["onset_time"].values[0]
+                else:
+                    current_onset = spr_data.iloc[int([row['reference_id']][0])]["onset_time"]
+
+                # if last note is a chord, grab one note from it
+                if type(spr_data.iloc[int([row['reference_id']][0])-1]["offset_time"]) == 'list':
+                    last_offset = spr_data.iloc[int([row['reference_id']][0])-1]["offset_time"].values[0]
+                    last_onset = spr_data.iloc[int([row['reference_id']][0])-1]["onset_time"].values[0]
+                else:
+                    last_offset = spr_data.iloc[int([row['reference_id']][0])-1]["offset_time"]
+                    last_onset = spr_data.iloc[int([row['reference_id']][0])-1]["onset_time"]
+
+                # get time between the notes
+                time_diff = current_onset - last_offset
+                # if there is time - there is a pause!
+                if time_diff > 0:
+                    # calculate pause length
+                    pause_beat_length = (time_length / ((reference_bpm / reference_timesig_numerator) / 60)) / 4 / 4
+                    pause_length = vexflow_length(pause_beat_length)
+                    # generate the pause
+                    pause = {
+                        'measure': measure,
+                        'pitch_integer': 0,
+                        'pitch_spelled': 'pause',
+                        'pitch_played_spelled': 'pause',
+                        'onset_time': last_onset,
+                        'length': pause_length,
+                        'note_type': 'pause'
+                        }
+                    # push pause to note array
+                    # UNCOMMENT WHEN FRONTEND CAN HANDLE PAUSES
+                    # performance_data['notes'].append(pause)
+
         # get note length if reference exists
         if row['reference_id'] != '*':
             time_length = spr_data.iloc[[row['reference_id']]]["time_diff"].values[0]
