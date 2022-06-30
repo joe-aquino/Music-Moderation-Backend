@@ -186,20 +186,20 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
     #     note_type -> "extra, missing, incorrect, reference"
     # ]
 
-    # consider creating rests as well
-
-    reference_bpm = 60 # should come from midi
-    reference_timesig_numerator = 4 # should come from midi
-    reference_timesig_denominator = 4 # should come from midi
+    reference_bpm = 60 # should come from midi, temporarily hardcoded
+    reference_timesig_numerator = 4 # should come from midi, temporarily hardcoded
+    reference_timesig_denominator = 4 # should come from midi, temporarily hardcoded
     # measure is time / beats per second * reference_timesig_numerator
     measure_func = lambda time : time // (reference_bpm / 60 * reference_timesig_numerator)
 
+    # this is the return array that will be sent to frontend for display with VexFlow
     performance_data = {
         'bpm': reference_bpm,
         'timesig': str(reference_timesig_numerator) + "/" + str(reference_timesig_denominator),
         'notes': []
     }
 
+    # iterate through the user submitted notes
     for idx, row in corresp_data.iterrows():
         # get note info
         pitch_played_spelled = None
@@ -242,7 +242,7 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
                 # if there is time - there is a pause!
                 if time_diff > 0:
                     # calculate pause length
-                    pause_beat_length = (time_length / ((reference_bpm / reference_timesig_numerator) / 60)) / 4 / 4
+                    pause_beat_length = (time_diff / ((reference_bpm / reference_timesig_numerator) / 60)) / 4 / 4
                     pause_length = vexflow_length(pause_beat_length) + 'r'
                     # generate the pause
                     pause = {
@@ -254,13 +254,14 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
                         'length': pause_length,
                         'note_type': 'pause'
                         }
+
                     # push pause to note array
                     # UNCOMMENT WHEN FRONTEND CAN HANDLE PAUSES
                     performance_data['notes'].append(pause)
 
         # get note length if reference exists
         if row['reference_id'] != '*':
-            time_length = spr_data.iloc[[row['reference_id']]]["time_diff"].values[0]
+            time_length = spr_data.iloc[int(row['reference_id'])+1]["time_diff"]
             # beat_length = time_length / measures per second
             # measures per minute = bpm / time signature numerator
             # measure per second = measures per minute / 60 seconds
