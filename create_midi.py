@@ -248,8 +248,8 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
                     pause = {
                         'measure': measure,
                         'pitch_integer': 0,
-                        'pitch_spelled': 'b4',
-                        'pitch_played_spelled': 'b4',
+                        'pitch_spelled': 'B4',
+                        'pitch_played_spelled': 'B4',
                         'onset_time': last_onset+0.01,
                         'length': pause_length,
                         'note_type': 'pause'
@@ -318,3 +318,4 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
     performance_data['notes'].sort(key=lambda x: (x['onset_time'], x['pitch_integer']))
 
     return performance_data
+

@@ -59,7 +59,7 @@ def transcribe_endpoint():
             # compare to reference and get error dict
             # convert output dictionary to json and respond to app
             if 'reference' in json:
-                data = create_midi.extract_errors(user_midi_file_name, reference_midi_file_name=json['reference'])
+                data = create_midi.extract_errors(user_midi_file_name, reference_midi_file_name=json['reference']+'.mid')
                 return jsonify(data)
             # if no reference is provided, use the test file
             data = create_midi.extract_errors(user_midi_file_name, reference_midi_file_name="reference_1octave_up.mid")
