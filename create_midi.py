@@ -310,6 +310,10 @@ def extract_errors(user_midi_file_name, reference_midi_file_name="reference_1oct
     # remove generated file garbage
     clean_up(user_midi_file_name, reference_midi_file_name)
 
+    # capitalize first letter   
+    for dic in performance_data['notes']:
+        dic['pitch_spelled'] = dic['pitch_spelled'].capitalize()
+
     # sort notes of dictionary by onset time and pitch
     performance_data['notes'].sort(key=lambda x: (x['onset_time'], x['pitch_integer']))
 
